@@ -1,5 +1,6 @@
 # Spring Ai 快速接入MCP 教程
-![](./src/main/resources/image/zs.png)
+<img src="./src/main/resources/image/zs.png" style="width:auto;  height: 400px;">   
+
 ## 环境准备
 * JDK版本为Jdk21
 * Spring Boot版本为3.5.3
