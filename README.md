@@ -1,12 +1,20 @@
 # Spring Ai 快速接入MCP 教程
-
+![](./src/main/resources/image/zs.png)
 ## 环境准备
-* JDK: 使用Jdk21,也可以选择jdk17
-* Spring Boot 版本为3.5.3
-* Spring AI 版本为1.0.0
-## 拉取demo 项目
+* JDK版本为Jdk21
+* Spring Boot版本为3.5.3
+* Spring AI版本为1.0.0
+## 项目代码
 从github 仓库，拉取git clone git@github.com:fjh2021/spring-ai-mcp-fast.git  
 项目代码简单讲解
+* 接入spring open ai
+```xml
+<dependency>
+ <groupId>org.springframework.ai</groupId>
+ <artifactId>spring-ai-starter-model-openai</artifactId>
+ <version>${spring-ai.version}</version>
+</dependency>
+```
 * 集成MCP Client
 ```xml
 <dependency>
@@ -15,13 +23,13 @@
  <version>${spring-ai.version}</version>
 </dependency>
 ```
-* 配置MCP Client
+* 配置MCP Client: 火车票 MCP
 ```yaml
 spring.ai.mcp.client.request-timeout=30s
 spring.ai.mcp.client.stdio.servers-configuration=classpath:/mcp-servers-config.json
 ```
-例子：火车票MCP:mcp-servers-config.json
 ```json
+
 {
     "mcpServers": {
         "12306-mcp": {
@@ -34,7 +42,7 @@ spring.ai.mcp.client.stdio.servers-configuration=classpath:/mcp-servers-config.j
     }
 }
 ```
-* 创建客户端
+* AI服务
 ```
 @Service
 public class ChatClientService {
@@ -50,18 +58,21 @@ public class ChatClientService {
                 .defaultToolCallbacks(mcpToolProvider).build();
     }
 ```
-* 接口
+* 测试接口
 ```
 public class OpenAiController {
     @Resource
     private ChatClientService chatClientService;
     
-    @GetMapping(value = "/ai/generateAsString")
+    @GetMapping(value = "/api/ai-test/chat")
     public String generateAsString(@RequestParam("message") String message) {
         return chatClientService.generateAsString(message);
     }
 }
 ```
-启动测试
-访问地址：
-  
+* 启动测试
+访问地址：http://localhost:8080/index.html   
+
+## 更多资讯
+想了解更多资讯，获得更多资料，请关注公众号【有范编程笔记】  
+![有范编程笔记公众号](./src/main/resources/image/fanjh.png)

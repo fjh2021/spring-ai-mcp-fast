@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "12306-mcp": {
+            "command": "npx.cmd",
+            "args": [
+                "-y",
+                "12306-mcp"
+            ]
+        }
+    }
+}

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 模型测试平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+        }
+
+        .chat-container {
+            max-width: 900px;
+            margin: 0.3em auto;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .chat-box {
+            height: 450px;
+            background-color: white;
+            padding: 1.5rem;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 1.25rem;
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .ai-message {
+            background-color: #e9ecef;
+            margin-right: auto;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+            display: block;
+            text-align: right;
+        }
+
+        .input-area {
+            background-color: white;
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .model-selector {
+            background-color: white;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            background-color: #e9ecef;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .parameter-slider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .parameter-slider label {
+            min-width: 100px;
+            font-size: 0.9rem;
+        }
+
+        .settings-panel {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .settings-panel.show {
+            max-height: 200px;
+            padding: 1rem 0;
+        }
+        .btn {
+            width: 90px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2><i class="bi bi-robot"></i> AI 模型测试平台</h2>
+            <p class="mb-0">Spring AI 接入 MCP 模型测试界面</p>
+        </div>
+
+        <div class="model-selector">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <div class="ai-message">
+                您好！我是AI助手，请问有什么可以帮您的吗？
+                <span class="message-time">系统消息</span>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" class="form-control" placeholder="输入您的问题..." autocomplete="off">
+            <button id="send-button" class="btn btn-primary ">
+                <i class="bi bi-send-fill"></i> 发送
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // 显示/隐藏高级设置
+        $('#settings-toggle').click(function() {
+            $('#settings-panel').toggleClass('show');
+            $(this).find('i').toggleClass('bi-gear bi-gear-fill');
+        });
+
+        // 更新滑块值显示
+        $('#temperature').on('input', function() {
+            $('#temperature-value').text($(this).val());
+        });
+
+        $('#max-tokens').on('input', function() {
+            $('#max-tokens-value').text($(this).val());
+        });
+
+        // 发送消息
+        function sendMessage() {
+            const userInput = $('#user-input').val().trim();
+            if (!userInput) return;
+
+            const modelId = $('#model-select').val();
+            const temperature = $('#temperature').val();
+            const maxTokens = $('#max-tokens').val();
+
+            // 添加用户消息到聊天框
+            const userMessageHtml = `
+                    <div class="message user-message">
+                        ${escapeHtml(userInput)}
+                        <span class="message-time">${formatTime(new Date())}</span>
+                    </div>
+                `;
+            $('#chat-box').append(userMessageHtml);
+
+            // 显示AI正在输入指示器
+            const typingIndicator = `
+                    <div class="message ai-message typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+            $('#chat-box').append(typingIndicator);
+
+            // 清空输入框并滚动到底部
+            $('#user-input').val('');
+            $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+
+            // 发送请求到后端
+            $.ajax({
+                url: '/api/ai-test/chat',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    message: userInput
+                }),
+                success: function(response) {
+                    // 移除正在输入指示器
+                    $('.typing-indicator').remove();
+
+                    // 添加AI回复
+                    const aiMessageHtml = `
+                            <div class="message ai-message">
+                                ${escapeHtml(response)}
+                                <span class="message-time">${formatTime(new Date())}</span>
+                            </div>
+                        `;
+                    $('#chat-box').append(aiMessageHtml);
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                },
+                error: function(xhr) {
+                    $('.typing-indicator').remove();
+                    const errorHtml = `
+                            <div class="message ai-message" style="color: #dc3545;">
+                                <i class="bi bi-exclamation-triangle-fill"></i> 请求失败: ${xhr.responseText || '服务器错误'}
+                                <span class="message-time">${formatTime(new Date())}</span>
+                            </div>
+                        `;
+                    $('#chat-box').append(errorHtml);
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                }
+            });
+        }
+
+        // 绑定发送按钮和回车键
+        $('#send-button').click(sendMessage);
+        $('#user-input').keypress(function(e) {
+            if (e.which === 13) {
+                sendMessage();
+            }
+        });
+
+        // 辅助函数
+        function formatTime(date) {
+            return date.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    });
+</script>
+</body>
+</html>
