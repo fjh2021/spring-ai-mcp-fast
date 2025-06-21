@@ -22,7 +22,7 @@
         }
 
         .chat-container {
-            max-width: 900px;
+            max-width: 500px;
             margin: 0.3em auto;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
             border-radius: 0.75rem;
@@ -30,6 +30,7 @@
         }
 
         .chat-header {
+            height: 80px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             padding: 1.5rem;
@@ -37,7 +38,7 @@
         }
 
         .chat-box {
-            height: 450px;
+            height: 540px;
             background-color: white;
             padding: 1.5rem;
             overflow-y: auto;
@@ -48,7 +49,6 @@
             margin-bottom: 1.25rem;
             max-width: 80%;
             padding: 0.75rem 1rem;
-            border-radius: 1rem;
             line-height: 1.5;
             position: relative;
             animation: fadeIn 0.3s ease-out;
@@ -58,11 +58,14 @@
             background-color: var(--primary-color);
             color: white;
             margin-left: auto;
+            margin-top: 10px;
             border-bottom-right-radius: 0.25rem;
         }
 
         .ai-message {
             background-color: #e9ecef;
+            padding-top: 10px;
+            padding-left: 10px;
             margin-right: auto;
             border-bottom-left-radius: 0.25rem;
         }
@@ -70,8 +73,9 @@
         .message-time {
             font-size: 0.75rem;
             opacity: 0.7;
-            margin-top: 0.25rem;
+            margin-top: -0.4rem;
             display: block;
+            padding-right: 10px;
             text-align: right;
         }
 
@@ -144,8 +148,12 @@
             padding: 1rem 0;
         }
         .btn {
-            width: 90px;
+            width: 100px;
             height: 50px;
+        }
+        .mb-0{
+            margin-top: -6px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -153,17 +161,8 @@
 <div class="container-fluid">
     <div class="chat-container">
         <div class="chat-header">
-            <h2><i class="bi bi-robot"></i> AI 模型测试平台</h2>
+            <h5><i class="bi bi-robot"></i> 有范编程 AI </h5>
             <p class="mb-0">Spring AI 接入 MCP 模型测试界面</p>
-        </div>
-
-        <div class="model-selector">
-            <div class="row g-3 align-items-center">
-                <div class="col-md-4">
-                </div>
-            </div>
-
-
         </div>
 
         <div class="chat-box" id="chat-box">
