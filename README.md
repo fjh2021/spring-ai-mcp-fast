@@ -15,6 +15,12 @@
  <version>${spring-ai.version}</version>
 </dependency>
 ```
+* 配置AI API KEY
+```yaml
+spring.ai.openai.base-url=https://dashscope.aliyuncs.com/compatible-mode/
+spring.ai.openai.chat.options.model=qwen-max
+spring.ai.openai.api-key=${OPEN_API_KEY} # API-KEY 百炼平台申请
+```
 * 集成MCP Client
 ```xml
 <dependency>
